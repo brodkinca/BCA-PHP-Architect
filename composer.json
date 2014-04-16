@@ -1,0 +1,25 @@
+{
+    "name": "bca/architect",
+    "description": "Phing build configuration for internal use in BCA projects.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Brodkin CyberArts",
+            "email": "info@brodkinca.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+
+    },
+    "require-dev": {
+        "bca/phpcs-standard": "@stable",
+        "phpmd/phpmd": "@stable",
+        "mayflower/php-codebrowser": "@stable",
+        "pdepend/pdepend": "@stable",
+        "phploc/phploc": "@stable",
+        "sebastian/phpcpd": "@stable",
+        "evert/phpdoc-md": "@stable",
+        "phpdocumentor/phpdocumentor": "@stable"
+    }
+}
