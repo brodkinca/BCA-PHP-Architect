@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Project Name" default="default">
+
+    <import file="vendor/bca/architect/build.default.xml"/>
+
+    <!--
+    Overwrite individual targets - can leave empty to stop a called target
+    from having any effect.
+    -->
+    <!--
+    <target name="..."></target>
+    -->
+
+</project>
