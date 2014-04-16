@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This is a default build file that sits outside of any project folders, but
+  which is imported into the project build file like so:
+    <import file="vendor/bca/architect/build.xml"/>
+  All relative references in this file, are assumed to be from the base of the
+  project build file.
+  If an identically named target in the project build file is also present in
+  this imported file, the one from the project file takes precedence. e.g. a
+  project build file can define a different "build" target to remove the ftp and
+  ftp-htaccess targets, for instance.
+-->
+
+<project name="architect" default="default">
+
+
+  <target name="default" depends="default-dev"/>
+  <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci"/>
+  <target name="default-dev" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
+  <target name="default-scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
+
+<!--
+  <target name="docs" depends="-preflight, clean, phpdoc, phpcb, copysvg, copybuild"/>
+-->
+
+  <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
+    <property name="project.-preflight-complete" value="true"/>
+  </target>
+
+  <target name="-load-properties">
+    <!-- Take a project name and make it safe for use as directory or file names -->
+    <php expression="preg_replace(&quot;/[\s\/]+/&quot;, '-', strtolower('${phing.project.name}'))" returnProperty="project.name.safe"/>
+    <!--
+    The ${phing.file.builddefault} value is the path to this imported file.
+    The property name matches the name attribute above for the project in this file.
+    -->
+    <php function="dirname" returnProperty="dir.architect">
+      <param value="${phing.file.architect}"/>
+    </php>
+
+    <!-- Pull in the global / default properties -->
+    <property file="${dir.architect}/build.default.properties" override="true"/>
+    <!-- Pull in the per-project properties. -->
+    <property file="build.properties" override="true"/>
+
+  </target>
+
+  <target name="-setup-dirs" depends="-load-properties">
+    <!-- My project set up is as follows:
+
+    ProjectName
+     - build (all the build file stuff)
+     - - api (phpDocumentor-generated API documentation which is later uploaded via FTP)
+     - - code-browser (phpcb-generated code browser)
+     - - dist (distributable zip file of source generated here)
+     - - logs (log files from static analysis)
+     - - pdepend (SVG images generated from PHP_Depend)
+     - src (the actual source)
+
+    By default the Phing built-in property $project.basedir points to my build file directory,
+    so here, we grab the path to the level above, and then create friendlier aliases.
+    -->
+    <property name="dir.project" value="${project.basedir}"/>
+    <property name="dir.build" value="${dir.project}/build"/>
+    <property name="dir.src" value="${dir.project}/src"/>
+    <property name="dir.docs" value="${dir.project}/docs"/>
+    <property name="dir.tests" value="${dir.project}/tests"/>
+    <property name="dir.vendor" value="${dir.project}/vendor"/>
+    <property name="dir.bin" value="${dir.vendor}/bin"/>
+
+    <echo message="Assigning build directories to properties" level="debug"/>
+    <property name="dir.build.api" value="${dir.build}/api"/>
+    <property name="dir.build.codebrowser" value="${dir.build}/code-browser"/>
+    <property name="dir.build.dist" value="${dir.build}/dist"/>
+    <property name="dir.build.logs" value="${dir.build}/logs"/>
+    <property name="dir.build.pdepend" value="${dir.build}/pdepend"/>
+    <property name="dir.build.phpdoc" value="${dir.build}/phpdoc"/>
+  </target>
+
+  <target name="-setup-filesets">
+    <patternset id="php">
+      <include name="${dir.src}/**/*.php"/>
+    </patternset>
+
+    <patternset id="tests">
+      <include name="**/*Test.php"/>
+    </patternset>
+
+    <patternset id="js">
+      <!-- Don't include minified files as they won't pass code standards -->
+      <include name="**/*.js"/>
+      <exclude name="**/*.min.js"/>
+    </patternset>
+
+    <patternset id="css">
+      <!-- Don't include minified files as they won't pass code standards -->
+      <include name="**/*.css"/>
+      <exclude name="**/*.min.css"/>
+    </patternset>
+
+    <patternset id="zip">
+      <!-- Exclude Mac / Windows / version control artifacts from zip -->
+      <exclude name="**/.DS_Store"/>
+      <exclude name="**/Thumbs.db"/>
+      <exclude name=".svn/"/>
+      <exclude name=".git/"/>
+    </patternset>
+
+    <patternset id="svg">
+      <include name="**/*.svg"/>
+    </patternset>
+
+    <fileset dir="${dir.src}" id="files.php">
+      <patternset refid="php"/>
+    </fileset>
+
+    <fileset dir="${dir.src}" id="files.js">
+      <patternset refid="js"/>
+    </fileset>
+
+    <fileset dir="${dir.src}" id="files.css">
+      <patternset refid="css"/>
+    </fileset>
+
+    <fileset dir="${dir.src}" id="files.zip">
+      <patternset refid="zip"/>
+    </fileset>
+
+    <fileset dir="${dir.build.pdepend}" id="files.pdepend.svg">
+      <patternset refid="svg"/>
+    </fileset>
+
+    <fileset dir="${dir.tests}" id="files.test">
+      <patternset refid="tests"/>
+    </fileset>
+
+    <property name="coding-standards.file" value="${project.name.safe}-coding-standards.txt"/>
+  </target>
+
+  <target name="-clean" depends="-preflight" unless="project.cleaned">
+    <!-- Remove previous build subdirectories, and recreate fresh versions -->
+    <echo message="Deleting build directories" level="debug"/>
+    <delete dir="${dir.build.api}"/>
+    <delete dir="${dir.build.codebrowser}"/>
+    <delete dir="${dir.build.logs}"/>
+    <delete dir="${dir.build.pdepend}"/>
+
+    <echo message="Creating build directories" level="debug"/>
+    <mkdir dir="${dir.build.api}"/>
+    <mkdir dir="${dir.build.codebrowser}"/>
+    <mkdir dir="${dir.build.dist}"/>
+    <mkdir dir="${dir.build.logs}"/>
+    <mkdir dir="${dir.build.pdepend}"/>
+
+    <property name="project.cleaned" value="true"/>
+  </target>
+
+  <!-- ## PROJECT INIT ## -->
+  <target name="init" depends="-preflight" description="Initialize project with git hooks.">
+    
+    <!-- Copy Default Build Properties to Project -->
+    <copy file="${dir.architect}/build.default.properties" 
+      tofile="${dir.project}/build.properties"
+      overwrite="false"/>
+
+    <!-- Symlink Pre-Commit Hook -->
+    <exec executable="ln" logoutput="true" checkreturn="true" level="debug">
+      <arg value="-sf"/>
+      <arg value="${dir.architect}/hooks/pre-commit.sh"/>
+      <arg value=".git/hooks/pre-commit"/>
+    </exec>
+
+  </target>
+
+  <!-- ## PHP LINT ## -->
+  <target name="lint" depends="-preflight" description="Check PHP files for syntax errors">
+    <phplint haltonfailure="true" cachefile="${dir.build.logs}/cachefile.txt">
+      <fileset refid="files.php"/>
+    </phplint>
+  </target>
+
+  <!-- ## PHPUNIT ## -->
+  <target name="phpunit-ci" depends="-preflight" description="Run unit tests">
+    <if>
+      <available file="${dir.project}/phpunit.xml.dist"/>
+      <elseif>
+        <available file="${dir.project}/phpunit.xml"/>
+      </elseif>
+      <else>
+        <property name="phpunit.noconfig" value="false" override="true"/>
+      </else>
+    </if>
+    <fail 
+      message="Your project does not have a PHPUnit XML configuation file."
+      if="${phpunit.noconfig}"/>
+    <exec 
+      executable="${dir.bin}/phpunit" 
+      logoutput="true" 
+      checkreturn="true" 
+      dir="${dir.project}">
+      <arg line="--coverage-html"/>
+      <arg path="${dir.build}/coverage"/>
+      <arg line="--coverage-clover"/>
+      <arg path="${dir.build.logs}/clover.xml"/>
+    </exec>
+  </target>
+
+  <target name="phpunit" depends="-preflight" description="Run unit tests">
+    <if>
+      <available file="${dir.project}/phpunit.xml.dist"/>
+      <elseif>
+        <available file="${dir.project}/phpunit.xml"/>
+      </elseif>
+      <else>
+        <property name="phpunit.noconfig" value="false" override="true"/>
+      </else>
+    </if>
+    <fail 
+      message="Your project does not have a PHPUnit XML configuation file."
+      if="${phpunit.noconfig}"/>
+    <exec 
+      executable="${dir.bin}/phpunit" 
+      logoutput="true" 
+      checkreturn="true" 
+      dir="${dir.project}">
+    </exec>
+  </target>
+
+  <!-- ## PHPLOC ## -->
+  <target name="phploc" depends="-preflight" description="Measure project size using PHPLOC">
+    <exec executable="${dir.bin}/phploc" logoutput="true" checkreturn="true" level="debug">
+      <arg value="--log-csv"/>
+      <arg value="${dir.build.logs}/phploc.csv"/>
+      <arg path="${dir.src}"/>
+    </exec>
+  </target>
+
+  <!-- ## PDEPEND ## -->
+  <target name="pdepend-ci" depends="-preflight" description="Calculate software metrics using PHP_Depend">
+    <exec executable="${dir.bin}/pdepend" logoutput="true" checkreturn="true" level="debug">
+      <arg line="--jdepend-xml=${dir.build.logs}/jdepend.xml"/>
+      <arg line="--summary-xml=${dir.build.logs}/jdepend-summary.xml"/>
+      <arg line="--jdepend-chart=${dir.build.pdepend}/dependencies.svg"/>
+      <arg line="--overview-pyramid=${dir.build.pdepend}/overview-pyramid.svg"/>
+      <arg line="${pdepend.src}"/>
+    </exec>
+  </target>
+
+  <!-- ## PHPMD ## -->
+  <target name="phpmd-ci" depends="-preflight" description="Perform project mess detection using PHPMD">
+    <exec executable="${dir.bin}/phpmd" logoutput="true" checkreturn="true" level="debug">
+      <arg line="--reportfile ${dir.build.logs}/pmd.xml"/>
+      <arg line="${phpmd.src}"/>
+      <arg line="xml"/>
+      <arg line="${phpmd.ruleset}"/>
+    </exec>
+  </target>
+
+  <target name="phpmd" depends="-preflight" description="Perform project mess detection using PHPMD">
+    <exec executable="${dir.bin}/phpmd" logoutput="true" checkreturn="true" level="debug">
+      <arg line="${phpmd.src}"/>
+      <arg line="text"/>
+      <arg line="${phpmd.ruleset}"/>
+    </exec>
+  </target>
+
+  <!-- ## PHPCS ## -->
+  <target name="phpcs-ci" depends="-preflight" description="Find coding standard violations using PHP_CodeSniffer">
+    <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug">
+      <arg value="--warning-severity=0"/>
+      <arg value="--standard=${phpcs.standard}"/>
+      <arg value="--report=checkstyle"/>
+      <arg value="--report-file=${dir.build.logs}/checkstyle.xml"/>
+      <arg line="${phpcs.fileset}"/>
+    </exec>
+  </target>
+
+  <target name="phpcs" depends="-preflight" description="Find coding standard violations using PHP_CodeSniffer">
+    <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug">
+      <arg value="-p"/>
+      <arg value="--warning-severity=0"/>
+      <arg value="--standard=${phpcs.standard}"/>
+      <arg line="${phpcs.fileset}"/>
+    </exec>
+  </target>
+
+  <!-- ## PHPCPD ## -->
+  <target name="phpcpd-ci" depends="-preflight" description="Find duplicate code using PHPCPD">
+    <exec executable="${dir.bin}/phpcpd" logoutput="true" checkreturn="true" level="debug">
+      <arg line="--log-pmd=${dir.build.logs}/pmd-cpd.xml"/>
+      <arg line="${phpcpd.src}"/>
+    </exec>
+  </target>
+
+  <target name="phpcpd" depends="-preflight" description="Find duplicate code using PHPCPD">
+    <exec executable="${dir.bin}/phpcpd" logoutput="true" checkreturn="true" level="debug">
+      <arg line="${phpcpd.src}"/>
+    </exec>
+  </target>
+
+  <!-- ## PHPDOC ## -->
+  <target name="phpdoc" depends="-preflight" description="Generate API documentation">
+    <exec executable="${dir.bin}/phpdoc.php" logoutput="true" checkreturn="true" level="debug">
+      <arg line="run"/>
+      <arg line="-t ${dir.build.phpdoc}"/>
+      <arg line="-d ${phpdoc.src}"/>
+      <arg line="--template xml"/>
+    </exec>
+    <exec executable="${dir.bin}/phpdocmd" logoutput="true" checkreturn="true" level="debug">
+      <arg line="${dir.build.phpdoc}/structure.xml"/>
+      <arg line="${dir.build.api}"/>
+    </exec>
+    <delete dir="${dir.build.phpdoc}"/>
+  </target>
+
+  <!-- ## PHPCB ## -->
+  <target name="phpcb" depends="-preflight" description="Aggregate tool output with PHP_CodeBrowser">
+    <exec executable="${dir.bin}/phpcb" logoutput="true" checkreturn="true" level="debug">
+      <arg value="--log"/>
+      <arg path="${dir.build.logs}"/>
+      <arg value="--source"/>
+      <arg path="${dir.src}"/>
+      <arg value="--output"/>
+      <arg path="${dir.build.codebrowser}"/>
+    </exec>
+  </target>
+
+  <!-- ## COPY:SVG ## -->
+  <target name="copysvg" depends="-preflight" description="Copy PHP_Depend SVGs to Jenkins workspace folder">
+    <copy todir="${dir.jenkins.workspace}">
+      <fileset refid="files.pdepend.svg"/>
+    </copy>
+  </target>
+
+  <!-- ## COPY:BUILD ## -->
+  <target name="copybuild" depends="-preflight" description="Copy build directory to Jenkins workspace folder so it can be archived">
+    <mkdir dir="${dir.jenkins.workspace}/build"/>
+    <copy todir="${dir.jenkins.workspace}/build">
+      <fileset dir="${dir.build}"/>
+    </copy>
+  </target>
+
+</project>
