@@ -15,6 +15,7 @@
         "mayflower/php-codebrowser": "@stable",
         "pdepend/pdepend": "@stable",
         "phploc/phploc": "@stable",
+        "phpunit/phpunit": "@stable",
         "sebastian/phpcpd": "@stable",
         "evert/phpdoc-md": "@stable",
         "phpdocumentor/phpdocumentor": "@stable"
