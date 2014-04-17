@@ -10,9 +10,6 @@
     ],
     "minimum-stability": "stable",
     "require": {
-
-    },
-    "require-dev": {
         "bca/phpcs-standard": "@stable",
         "phpmd/phpmd": "@stable",
         "mayflower/php-codebrowser": "@stable",
