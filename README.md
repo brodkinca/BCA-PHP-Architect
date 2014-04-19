@@ -21,9 +21,13 @@ modify the tasks and add its own without having to reinvent the wheel.
 
 ## Getting Started
 
-1. Run `composer require --dev bca/architect` in the CLI.
-2. Copy `build.project.xml` to your project directory as `build.xml`.
-3. **Optional** Run `phing init` to create a good starting point. This command will:
+1. Run the following commands in the CLI:
+    ```sh
+      composer require --dev bca/architect
+      phing -f vendor/bca/architect/build.default.xml buildfile
+    ```
+    
+2. **Optional** Run `phing init` to create a good starting point. This command will:
   - Copy the default build.properties file to the root of your project.
   - Set the name of the project based upon the name of your directory.
   - Symlink your Git pre-commit hook to the `phing scm` task.

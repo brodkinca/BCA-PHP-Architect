@@ -175,6 +175,15 @@
 
   </target>
 
+  <!-- ## PROJECT BUILD FILE ## -->
+  <target name="buildfile" depends="-preflight" description="Copy Default Build XML to Current Directory.">
+
+    <copy file="${dir.architect}/build.project.xml" 
+      tofile="${application.startdir}/build.xml"
+      overwrite="false"/>
+
+  </target>
+
   <!-- ## PHP LINT ## -->
   <target name="lint" depends="-preflight" description="Check PHP files for syntax errors">
     <phplint haltonfailure="true" cachefile="${dir.build.logs}/cachefile.txt">
