@@ -152,7 +152,7 @@
 
   <!-- ## PROJECT INIT ## -->
   <target name="init" depends="-preflight" description="Initialize project with git hooks.">
-    
+
     <!-- Copy Default Build Properties to Project -->
     <copy file="${dir.architect}/build.default.properties" 
       tofile="${dir.project}/build.properties"
