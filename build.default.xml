@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  This is a default build file that sits outside of any project folders, but
-  which is imported into the project build file like so:
+  This is a default build file that is not committed into the SCM but imported 
+  via Composer into the project build file like so:
     <import file="vendor/bca/architect/build.xml"/>
+
   All relative references in this file, are assumed to be from the base of the
   project build file.
+
   If an identically named target in the project build file is also present in
   this imported file, the one from the project file takes precedence. e.g. a
-  project build file can define a different "build" target to remove the ftp and
-  ftp-htaccess targets, for instance.
+  project build file can define a different "default-ci" target to remove the 
+  document generation from the CI task, for instance.
 -->
 
 <project name="architect" default="default">
-
 
   <target name="default" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
   <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, phpdoc, phpcb"/>
@@ -42,19 +43,18 @@
   </target>
 
   <target name="-setup-dirs" depends="-load-properties">
-    <!-- My project set up is as follows:
+    <!-- 
+      Directory structure:
 
-    ProjectName
-     - build (all the build file stuff)
-     - - api (phpDocumentor-generated API documentation which is later uploaded via FTP)
-     - - code-browser (phpcb-generated code browser)
-     - - dist (distributable zip file of source generated here)
-     - - logs (log files from static analysis)
-     - - pdepend (SVG images generated from PHP_Depend)
-     - src (the actual source)
-
-    By default the Phing built-in property $project.basedir points to my build file directory,
-    so here, we grab the path to the level above, and then create friendlier aliases.
+      ProjectName
+       - build (all the build file stuff)
+       - - api (phpDocumentor-generated API docs)
+       - - code-browser (phpcb-generated code browser)
+       - - logs (log files from static analysis)
+       - - pdepend (SVG images generated from PHP_Depend)
+       - docs
+       - src (the actual source)
+       - tests
     -->
     <property name="dir.project" value="${project.basedir}"/>
     <property name="dir.build" value="${dir.project}/build"/>
