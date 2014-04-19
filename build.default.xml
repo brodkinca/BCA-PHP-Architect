@@ -15,14 +15,9 @@
 <project name="architect" default="default">
 
 
-  <target name="default" depends="default-dev"/>
-  <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci"/>
-  <target name="default-dev" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
-  <target name="default-scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
-
-<!--
-  <target name="docs" depends="-preflight, clean, phpdoc, phpcb, copysvg, copybuild"/>
--->
+  <target name="default" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
+  <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, phpdoc, phpcb"/>
+  <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
     <property name="project.-preflight-complete" value="true"/>
