@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Project Name" default="default">
+<project name="project-name" default="default">
 
     <import file="vendor/bca/architect/build.default.xml"/>
 
