@@ -16,8 +16,8 @@
 
 <project name="architect" default="default">
 
-  <target name="default" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
-  <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, phpdoc, phpcb"/>
+  <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, phpunit, project-post"/>
+  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, project-post, phpdoc, phpcb"/>
   <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
@@ -334,5 +334,10 @@
       <fileset dir="${dir.build}"/>
     </copy>
   </target>
+
+  <!-- ## PROJECT-SPECIFIC BUILD TASKS ## -->
+  <!-- Do nothing unless overridden by project. -->
+  <target name="project-pre"/>
+  <target name="project-post"/>
 
 </project>
