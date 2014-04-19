@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 git stash -q --keep-index
-phing default-scm
+phing scm
 rc=$?
 git stash pop -q
 exit $rc

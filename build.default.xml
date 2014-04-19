@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  This is a default build file that sits outside of any project folders, but
-  which is imported into the project build file like so:
+  This is a default build file that is not committed into the SCM but imported 
+  via Composer into the project build file like so:
     <import file="vendor/bca/architect/build.xml"/>
+
   All relative references in this file, are assumed to be from the base of the
   project build file.
+
   If an identically named target in the project build file is also present in
   this imported file, the one from the project file takes precedence. e.g. a
-  project build file can define a different "build" target to remove the ftp and
-  ftp-htaccess targets, for instance.
+  project build file can define a different "default-ci" target to remove the 
+  document generation from the CI task, for instance.
 -->
 
 <project name="architect" default="default">
 
-
-  <target name="default" depends="-preflight, -clean, lint, phploc, phpmd, phpcs, phpcpd, phpunit"/>
-  <target name="default-ci" depends="-preflight, -clean, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, phpdoc, phpcb"/>
+  <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, phpunit, project-post"/>
+  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, project-post, phpdoc, phpcb"/>
   <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
@@ -42,19 +43,18 @@
   </target>
 
   <target name="-setup-dirs" depends="-load-properties">
-    <!-- My project set up is as follows:
+    <!-- 
+      Directory structure:
 
-    ProjectName
-     - build (all the build file stuff)
-     - - api (phpDocumentor-generated API documentation which is later uploaded via FTP)
-     - - code-browser (phpcb-generated code browser)
-     - - dist (distributable zip file of source generated here)
-     - - logs (log files from static analysis)
-     - - pdepend (SVG images generated from PHP_Depend)
-     - src (the actual source)
-
-    By default the Phing built-in property $project.basedir points to my build file directory,
-    so here, we grab the path to the level above, and then create friendlier aliases.
+      ProjectName
+       - build (all the build file stuff)
+       - - api (phpDocumentor-generated API docs)
+       - - code-browser (phpcb-generated code browser)
+       - - logs (log files from static analysis)
+       - - pdepend (SVG images generated from PHP_Depend)
+       - docs
+       - src (the actual source)
+       - tests
     -->
     <property name="dir.project" value="${project.basedir}"/>
     <property name="dir.build" value="${dir.project}/build"/>
@@ -130,7 +130,6 @@
       <patternset refid="tests"/>
     </fileset>
 
-    <property name="coding-standards.file" value="${project.name.safe}-coding-standards.txt"/>
   </target>
 
   <target name="-clean" depends="-preflight" unless="project.cleaned">
@@ -153,11 +152,19 @@
 
   <!-- ## PROJECT INIT ## -->
   <target name="init" depends="-preflight" description="Initialize project with git hooks.">
-    
+
     <!-- Copy Default Build Properties to Project -->
     <copy file="${dir.architect}/build.default.properties" 
       tofile="${dir.project}/build.properties"
       overwrite="false"/>
+
+    <!-- Update Project Name -->
+    <php expression="basename('${dir.project}')" returnProperty="project.dirname"/>
+    <exec executable="sed" logoutput="true" checkreturn="true" level="debug">
+      <arg value="-i.bak"/>
+      <arg value="s/project-name/${project.dirname}/g"/>
+      <arg value="${phing.file}"/>
+    </exec>
 
     <!-- Symlink Pre-Commit Hook -->
     <exec executable="ln" logoutput="true" checkreturn="true" level="debug">
@@ -165,6 +172,15 @@
       <arg value="${dir.architect}/hooks/pre-commit.sh"/>
       <arg value=".git/hooks/pre-commit"/>
     </exec>
+
+  </target>
+
+  <!-- ## PROJECT BUILD FILE ## -->
+  <target name="buildfile" depends="-preflight" description="Copy Default Build XML to Current Directory.">
+
+    <copy file="${dir.architect}/build.project.xml" 
+      tofile="${application.startdir}/build.xml"
+      overwrite="false"/>
 
   </target>
 
@@ -335,5 +351,10 @@
       <fileset dir="${dir.build}"/>
     </copy>
   </target>
+
+  <!-- ## PROJECT-SPECIFIC BUILD TASKS ## -->
+  <!-- Do nothing unless overridden by project. -->
+  <target name="project-pre"/>
+  <target name="project-post"/>
 
 </project>
