@@ -1,7 +1,7 @@
 {
     "name": "bca/architect",
     "description": "Phing build configuration for internal use in BCA projects.",
-    "license": "MIT",
+    "license": "GPL-3.0+",
     "authors": [
         {
             "name": "Brodkin CyberArts",
