@@ -130,7 +130,6 @@
       <patternset refid="tests"/>
     </fileset>
 
-    <property name="coding-standards.file" value="${project.name.safe}-coding-standards.txt"/>
   </target>
 
   <target name="-clean" depends="-preflight" unless="project.cleaned">
