@@ -23,7 +23,7 @@ modify the tasks and add its own without having to reinvent the wheel.
 
 1. Run the following commands in the CLI:
     ```sh
-      composer require --dev bca/architect
+      composer require --dev bca/architect:@stable
       phing -f vendor/bca/architect/build.default.xml buildfile
     ```
     
