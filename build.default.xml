@@ -158,6 +158,14 @@
       tofile="${dir.project}/build.properties"
       overwrite="false"/>
 
+    <!-- Update Project Name -->
+    <php expression="basename('${dir.project}')" returnProperty="project.dirname"/>
+    <exec executable="sed" logoutput="true" checkreturn="true" level="debug">
+      <arg value="-i.bak"/>
+      <arg value="s/project-name/${project.dirname}/g"/>
+      <arg value="${phing.file}"/>
+    </exec>
+
     <!-- Symlink Pre-Commit Hook -->
     <exec executable="ln" logoutput="true" checkreturn="true" level="debug">
       <arg value="-sf"/>
