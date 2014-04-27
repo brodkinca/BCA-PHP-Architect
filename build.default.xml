@@ -175,6 +175,16 @@
 
   </target>
 
+  <!-- ## PHING INSTALL ## -->
+  <target name="install" depends="-preflight" description="Download latest Phing into project.">
+
+    <exec executable="wget" logoutput="true" checkreturn="true" level="debug">
+      <arg value="http://www.phing.info/get/phing-latest.phar"/>
+      <arg value="--output-document=${dir.project}/phing.phar"/>
+    </exec>
+
+  </target>
+
   <!-- ## PROJECT BUILD FILE ## -->
   <target name="buildfile" depends="-preflight" description="Copy Default Build XML to Current Directory.">
 
