@@ -154,7 +154,7 @@
   <target name="init" depends="-preflight" description="Initialize project with git hooks.">
 
     <!-- Copy Default Build Properties to Project -->
-    <copy file="${dir.architect}/build.default.properties" 
+    <copy file="${dir.architect}/build.project.properties" 
       tofile="${dir.project}/build.properties"
       overwrite="false"/>
 
@@ -184,6 +184,7 @@
     </exec>
 
   </target>
+
 
   <!-- ## PROJECT BUILD FILE ## -->
   <target name="buildfile" depends="-preflight" description="Copy Default Build XML to Current Directory.">
