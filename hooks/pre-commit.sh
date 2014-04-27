@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 git stash -q --keep-index
-phing scm
+php phing.phar scm
 rc=$?
 git stash pop -q
 exit $rc
