@@ -16,9 +16,10 @@
 
 <project name="architect" default="default">
 
-  <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, phpunit, project-post"/>
-  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, phpunit-ci, pdepend-ci, project-post, phpdoc, phpcb"/>
-  <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, phpunit"/>
+  <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, test, project-post"/>
+  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, test, pdepend-ci, project-post, phpdoc, phpcb"/>
+  <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, test"/>
+  <target name="test" depends="-preflight, phpunit" description="Run test suite"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
     <property name="project.-preflight-complete" value="true"/>
@@ -203,7 +204,7 @@
   </target>
 
   <!-- ## PHPUNIT ## -->
-  <target name="phpunit-ci" depends="-preflight" description="Run unit tests">
+  <target name="phpunit" depends="-preflight" description="Run unit tests">
     <if>
       <available file="${dir.project}/phpunit.xml.dist"/>
       <elseif>
@@ -225,27 +226,6 @@
       <arg path="${dir.build}/coverage"/>
       <arg line="--coverage-clover"/>
       <arg path="${dir.build.logs}/clover.xml"/>
-    </exec>
-  </target>
-
-  <target name="phpunit" depends="-preflight" description="Run unit tests">
-    <if>
-      <available file="${dir.project}/phpunit.xml.dist"/>
-      <elseif>
-        <available file="${dir.project}/phpunit.xml"/>
-      </elseif>
-      <else>
-        <property name="phpunit.noconfig" value="false" override="true"/>
-      </else>
-    </if>
-    <fail 
-      message="Your project does not have a PHPUnit XML configuation file."
-      if="${phpunit.noconfig}"/>
-    <exec 
-      executable="${dir.bin}/phpunit" 
-      logoutput="true" 
-      checkreturn="true" 
-      dir="${dir.project}">
     </exec>
   </target>
 
