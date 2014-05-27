@@ -270,6 +270,7 @@
   <!-- ## PHPCS ## -->
   <target name="phpcs-ci" depends="-preflight" description="Find coding standard violations using PHP_CodeSniffer">
     <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug">
+      <arg value="--extensions=php"/>
       <arg value="--warning-severity=0"/>
       <arg value="--standard=${phpcs.standard}"/>
       <arg value="--report=checkstyle"/>
@@ -280,6 +281,7 @@
 
   <target name="phpcs" depends="-preflight" description="Find coding standard violations using PHP_CodeSniffer">
     <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug">
+      <arg value="--extensions=php"/>
       <arg value="-p"/>
       <arg value="--warning-severity=0"/>
       <arg value="--standard=${phpcs.standard}"/>
