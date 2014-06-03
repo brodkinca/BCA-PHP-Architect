@@ -10,14 +10,14 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "bca/phpcs-standard": "@stable",
-        "phpmd/phpmd": "@stable",
-        "mayflower/php-codebrowser": "@stable",
-        "pdepend/pdepend": "@stable",
-        "phploc/phploc": "@stable",
-        "phpunit/phpunit": "@stable",
-        "sebastian/phpcpd": "@stable",
-        "evert/phpdoc-md": "@stable",
-        "phpdocumentor/phpdocumentor": "@stable"
+        "bca/phpcs-standard": "~1.0",
+        "phpmd/phpmd": "~2.0",
+        "mayflower/php-codebrowser": "~1.1",
+        "pdepend/pdepend": "~1.1",
+        "phploc/phploc": "~2.0",
+        "phpunit/phpunit": "~4.0",
+        "sebastian/phpcpd": "~2.0",
+        "evert/phpdoc-md": "~0.0",
+        "phpdocumentor/phpdocumentor": "~2.5"
     }
 }
