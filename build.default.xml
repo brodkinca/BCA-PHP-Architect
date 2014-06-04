@@ -279,6 +279,16 @@
     </exec>
   </target>
 
+  <target name="phpcs-i" depends="-preflight" description="Interactively find coding standard violations using PHP_CodeSniffer">
+    <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug" passthru="true">
+      <arg value="-a"/>
+      <arg value="--extensions=php"/>
+      <arg value="--warning-severity=0"/>
+      <arg value="--standard=${phpcs.standard}"/>
+      <arg line="${phpcs.fileset}"/>
+    </exec>
+  </target>
+
   <target name="phpcs" depends="-preflight" description="Find coding standard violations using PHP_CodeSniffer">
     <exec executable="${dir.bin}/phpcs" logoutput="true" checkreturn="true" level="debug">
       <arg value="--extensions=php"/>
