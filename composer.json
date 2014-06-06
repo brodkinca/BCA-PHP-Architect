@@ -13,7 +13,7 @@
         "bca/phpcs-standard": "~1.0",
         "phpmd/phpmd": "~1.4",
         "mayflower/php-codebrowser": "~1.1",
-        "pdepend/pdepend": "~1.1",
+        "pdepend/pdepend": "1.1.*",
         "phploc/phploc": "~2.0",
         "phpunit/phpunit": ">=3.7",
         "sebastian/phpcpd": "~2.0",
