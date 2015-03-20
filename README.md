@@ -1,9 +1,9 @@
 # Architect
 
-**Important Notice:** *This repository, while open source, is not generally well-suited for use in
-the projects of other agencies or individuals without significant modification.
-That being said we encourage you to fork and use it in part or in whole as you
-see fit.*
+**Important Notice:** *This repository, while open source, is not generally 
+well-suited for use in the projects of other agencies or individuals without 
+significant modification. That being said we encourage you to fork and use it 
+in part or in whole as you see fit.*
 
 ## What is it?
 
@@ -23,7 +23,7 @@ modify the tasks and add its own without having to reinvent the wheel.
 
 1. Run the following commands in the CLI:
     ```sh
-      composer require --dev bca/architect:~1.1
+      composer require --dev bca/architect:~1.2
       phing -f vendor/bca/architect/build.default.xml buildfile
     ```
     
@@ -55,4 +55,4 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-Copyright 2014 [Brodkin CyberArts](http://brodkinca.com/)
+Copyright 2015 [Brodkin CyberArts](http://brodkinca.com/)
