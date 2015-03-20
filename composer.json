@@ -10,7 +10,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "bca/phpcs-standard": "~1.0",
+        "bca/phpcs-standard": "~1.1",
         "phpmd/phpmd": "~2.2",
         "mayflower/php-codebrowser": "~1.1",
         "pdepend/pdepend": "~2.0",
