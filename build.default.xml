@@ -19,7 +19,6 @@
   <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, test, project-post"/>
   <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, test, pdepend-ci, project-post, phpdoc, phpcb"/>
   <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, test"/>
-  <target name="test" depends="-preflight, phpunit" description="Run test suite"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
     <property name="project.-preflight-complete" value="true"/>
@@ -196,6 +195,13 @@
 
   </target>
 
+  <!-- ## CODECEPTION ## -->
+  <target name="codeception" depends="-preflight" description="Run codeception tests">
+    <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
+      <arg line="run"/>
+    </exec>
+  </target>
+
   <!-- ## PHP LINT ## -->
   <target name="lint" depends="-preflight" description="Check PHP files for syntax errors">
     <phplint haltonfailure="true" cachefile="${dir.build.logs}/cachefile.txt">
@@ -337,6 +343,11 @@
       <arg value="--output"/>
       <arg path="${dir.build.codebrowser}"/>
     </exec>
+  </target>
+
+  <!-- ## RUN TEST SUITE ## -->
+  <target name="test" depends="-preflight" description="Run defined test suite">
+    <phing phingfile="${phing.file.architect}" inheritRefs="true" target="${test.suite}" />
   </target>
 
   <!-- ## COPY:SVG ## -->
