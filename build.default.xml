@@ -202,6 +202,50 @@
     </exec>
   </target>
 
+  <!-- ## DOCKER ## -->
+  <target name="-docker-preflight" depends="-preflight">
+    <resolvepath propertyName="docker.vol.host.abs" file="${docker.vol.host}"/>
+  </target>
+
+  <target name="docker-build" depends="-preflight, -docker-preflight">
+    <exec executable="docker" logoutput="true" checkreturn="true" level="debug" passthru="true">
+      <arg value="build"/>
+      <arg value="--pull"/>
+      <arg value="."/>
+    </exec>
+    <exec command="docker images -q | head -n 1" checkreturn="true" level="debug" outputProperty="docker.image"/>
+  </target>
+
+  <target name="docker-run" depends="-preflight, -docker-preflight, -docker-catports, docker-build">
+    <exec executable="docker" logoutput="true" checkreturn="false">
+      <arg value="rm"/>
+      <arg value="-f"/>
+      <arg value="${project.name.safe}"/>
+    </exec>
+    <exec executable="docker" logoutput="true" checkreturn="true" level="debug" passthru="true" spawn="true">
+      <arg value="run"/>
+      <arg value="--rm"/>
+      <arg line="--name='${project.name.safe}'"/>
+      <arg line="${docker.ports.publish}"/>
+      <arg line="--volume=${docker.vol.host.abs}:${docker.vol.guest}"/>
+      <arg value="${docker.image}"/>
+    </exec>
+  </target>
+
+  <target name="-docker-catports" depends="-preflight">
+    <php expression="'--publish='.implode(' --publish=', explode(',','${docker.ports}'));" returnProperty="docker.ports.publish" level="debug"/>
+  </target>
+
+  <target name="-docker-boot2docker" depends="-preflight">
+    <exec command="boot2docker init" logoutput="true" checkreturn="false" level="debug"/>
+    <exec command="VBoxManage sharedfolder add boot2docker-vm -name bcadev -hostpath /Volumes/Development" logoutput="true" checkreturn="false" level="debug"/>
+    <exec command="boot2docker up" logoutput="true" checkreturn="false" level="debug"/>
+    <exec command="$(boot2docker shellinit)" logoutput="false" checkreturn="false"/>
+    <exec command="boot2docker ssh 'sudo modprobe vboxsf &amp;&amp; sudo mkdir -v -p /Volumes/Development &amp;&amp; sudo mount -v -t vboxsf -o uid=0,gid=0 bcadev /Volumes/Development'" logoutput="true" checkreturn="false" level="debug"/>
+  </target>
+
+  <target name="docker" depends="-docker-boot2docker, docker-run"/>
+
   <!-- ## PHP LINT ## -->
   <target name="lint" depends="-preflight" description="Check PHP files for syntax errors">
     <phplint haltonfailure="true" cachefile="${dir.build.logs}/cachefile.txt">
