@@ -222,6 +222,15 @@
     <resolvepath propertyName="docker.vol.host.abs" file="${docker.vol.host}"/>
   </target>
 
+  <target name="docker-bash" depends="-preflight">
+    <exec executable="docker" logoutput="true" passthru="true">
+      <arg value="exec"/>
+      <arg line="-it"/>
+      <arg value="${project.name.safe}"/>
+      <arg value="bash"/>
+    </exec>
+  </target>
+
   <target name="docker-build" depends="-preflight, -docker-preflight">
     <exec executable="docker" logoutput="true" checkreturn="true" level="debug" passthru="true">
       <arg value="build"/>
