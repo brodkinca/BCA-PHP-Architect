@@ -17,7 +17,7 @@
 <project name="architect" default="default">
 
   <target name="default" depends="-preflight, -clean, project-pre, lint, phploc, phpmd, phpcs, phpcpd, test, project-post"/>
-  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, test, pdepend-ci, project-post, phpdoc, phpcb"/>
+  <target name="default-ci" depends="-preflight, -clean, project-pre, lint, phploc, phpmd-ci, phpcs-ci, phpcpd, test-ci, pdepend-ci, project-post, phpcb"/>
   <target name="scm" depends="-preflight, -clean, phpmd, phpcs, phpcpd, test"/>
 
   <target name="-preflight" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.-preflight-complete">
@@ -67,10 +67,8 @@
     <echo message="Assigning build directories to properties" level="debug"/>
     <property name="dir.build.api" value="${dir.build}/api"/>
     <property name="dir.build.codebrowser" value="${dir.build}/code-browser"/>
-    <property name="dir.build.dist" value="${dir.build}/dist"/>
     <property name="dir.build.logs" value="${dir.build}/logs"/>
     <property name="dir.build.pdepend" value="${dir.build}/pdepend"/>
-    <property name="dir.build.phpdoc" value="${dir.build}/phpdoc"/>
   </target>
 
   <target name="-setup-filesets">
@@ -143,7 +141,6 @@
     <echo message="Creating build directories" level="debug"/>
     <mkdir dir="${dir.build.api}"/>
     <mkdir dir="${dir.build.codebrowser}"/>
-    <mkdir dir="${dir.build.dist}"/>
     <mkdir dir="${dir.build.logs}"/>
     <mkdir dir="${dir.build.pdepend}"/>
 
@@ -177,12 +174,10 @@
 
   <!-- ## PHING INSTALL ## -->
   <target name="install" depends="-preflight" description="Download latest Phing into project.">
-
     <exec executable="wget" logoutput="true" checkreturn="true" level="debug">
       <arg value="http://www.phing.info/get/phing-latest.phar"/>
       <arg value="--output-document=${dir.project}/phing.phar"/>
     </exec>
-
   </target>
 
 
@@ -196,15 +191,44 @@
   </target>
 
   <!-- ## CODECEPTION ## -->
-  <target name="codeception" depends="-preflight" description="Run codeception tests">
+  <target name="codeception" depends="-preflight, -codeception-catenv-local" description="Run codeception tests">
     <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
       <arg line="run"/>
+      <arg line="--coverage-html"/>
+      <arg line="${codeception.env}"/>
     </exec>
+  </target>
+
+  <target name="codeception-ci" depends="-preflight, -codeception-catenv-ci" description="Run codeception tests">
+    <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
+      <arg line="run"/>
+      <arg line="--fail-fast"/>
+      <arg line="--coverage-xml"/>
+      <arg line="--xml"/>
+      <arg line="${codeception.env}"/>
+    </exec>
+  </target>
+
+  <target name="-codeception-catenv-local" depends="-preflight">
+    <php expression="'--env='.implode(' --env=', explode(',','${codeception.env.local}'));" returnProperty="codeception.env" level="debug"/>
+  </target>
+
+  <target name="-codeception-catenv-ci" depends="-preflight">
+    <php expression="'--env='.implode(' --env=', explode(',','${codeception.env.ci}'));" returnProperty="codeception.env" level="debug"/>
   </target>
 
   <!-- ## DOCKER ## -->
   <target name="-docker-preflight" depends="-preflight">
     <resolvepath propertyName="docker.vol.host.abs" file="${docker.vol.host}"/>
+  </target>
+
+  <target name="docker-bash" depends="-preflight">
+    <exec executable="docker" logoutput="true" passthru="true">
+      <arg value="exec"/>
+      <arg line="-it"/>
+      <arg value="${project.name.safe}"/>
+      <arg value="bash"/>
+    </exec>
   </target>
 
   <target name="docker-build" depends="-preflight, -docker-preflight">
@@ -228,6 +252,21 @@
       <arg line="--name='${project.name.safe}'"/>
       <arg line="${docker.ports.publish}"/>
       <arg line="--volume=${docker.vol.host.abs}:${docker.vol.guest}"/>
+      <arg value="${docker.image}"/>
+    </exec>
+  </target>
+
+  <target name="docker-run-nomount" depends="-preflight, -docker-preflight, -docker-catports, docker-build">
+    <exec executable="docker" logoutput="true" checkreturn="false">
+      <arg value="rm"/>
+      <arg value="-f"/>
+      <arg value="${project.name.safe}"/>
+    </exec>
+    <exec executable="docker" logoutput="true" checkreturn="true" level="debug" passthru="true" spawn="true">
+      <arg value="run"/>
+      <arg value="--rm"/>
+      <arg line="--name='${project.name.safe}'"/>
+      <arg line="${docker.ports.publish}"/>
       <arg value="${docker.image}"/>
     </exec>
   </target>
@@ -362,24 +401,10 @@
     </exec>
   </target>
 
-  <!-- ## PHPDOC ## -->
-  <target name="phpdoc" depends="-preflight" description="Generate API documentation">
-    <exec executable="${dir.bin}/phpdoc.php" logoutput="true" checkreturn="true" level="debug">
-      <arg line="run"/>
-      <arg line="-t ${dir.build.phpdoc}"/>
-      <arg line="-d ${phpdoc.src}"/>
-      <arg line="--template xml"/>
-    </exec>
-    <exec executable="${dir.bin}/phpdocmd" logoutput="true" checkreturn="true" level="debug">
-      <arg line="${dir.build.phpdoc}/structure.xml"/>
-      <arg line="${dir.build.api}"/>
-    </exec>
-    <delete dir="${dir.build.phpdoc}"/>
-  </target>
-
   <!-- ## PHPCB ## -->
+  <!-- Setting checkreturn="false" pending bug fixes from author. -->
   <target name="phpcb" depends="-preflight" description="Aggregate tool output with PHP_CodeBrowser">
-    <exec executable="${dir.bin}/phpcb" logoutput="true" checkreturn="true" level="debug">
+    <exec executable="${dir.bin}/phpcb" logoutput="true" checkreturn="false" level="debug">
       <arg value="--log"/>
       <arg path="${dir.build.logs}"/>
       <arg value="--source"/>
@@ -392,6 +417,10 @@
   <!-- ## RUN TEST SUITE ## -->
   <target name="test" depends="-preflight" description="Run defined test suite">
     <phing phingfile="${phing.file.architect}" inheritRefs="true" target="${test.suite}" />
+  </target>
+
+  <target name="test-ci" depends="-preflight" description="Run defined test suite">
+    <phing phingfile="${phing.file.architect}" inheritRefs="true" target="${test.suite}-ci" />
   </target>
 
   <!-- ## COPY:SVG ## -->
