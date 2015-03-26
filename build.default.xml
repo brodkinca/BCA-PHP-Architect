@@ -256,6 +256,21 @@
     </exec>
   </target>
 
+  <target name="docker-run-nomount" depends="-preflight, -docker-preflight, -docker-catports, docker-build">
+    <exec executable="docker" logoutput="true" checkreturn="false">
+      <arg value="rm"/>
+      <arg value="-f"/>
+      <arg value="${project.name.safe}"/>
+    </exec>
+    <exec executable="docker" logoutput="true" checkreturn="true" level="debug" passthru="true" spawn="true">
+      <arg value="run"/>
+      <arg value="--rm"/>
+      <arg line="--name='${project.name.safe}'"/>
+      <arg line="${docker.ports.publish}"/>
+      <arg value="${docker.image}"/>
+    </exec>
+  </target>
+
   <target name="-docker-catports" depends="-preflight">
     <php expression="'--publish='.implode(' --publish=', explode(',','${docker.ports}'));" returnProperty="docker.ports.publish" level="debug"/>
   </target>
