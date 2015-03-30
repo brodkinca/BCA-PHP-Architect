@@ -15,8 +15,6 @@
         "mayflower/php-codebrowser": "~1.1",
         "pdepend/pdepend": "~2.0",
         "phploc/phploc": "~2.1",
-        "sebastian/phpcpd": "~2.0",
-        "evert/phpdoc-md": "~0.0",
-        "phpdocumentor/phpdocumentor": "~2.5"
+        "sebastian/phpcpd": "~2.0"
     }
 }
