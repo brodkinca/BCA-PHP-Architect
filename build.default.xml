@@ -205,6 +205,7 @@
       <arg line="--fail-fast"/>
       <arg line="--coverage-xml"/>
       <arg line="--xml"/>
+      <arg line="--no-exit"/>
       <arg line="${codeception.env}"/>
     </exec>
   </target>
