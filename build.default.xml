@@ -191,7 +191,7 @@
   </target>
 
   <!-- ## CODECEPTION ## -->
-  <target name="codeception" depends="-preflight, -codeception-catenv-local" description="Run codeception tests">
+  <target name="codeception" depends="-preflight, -codeception-catenv-local, -codeception-build" description="Run codeception tests">
     <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
       <arg line="run"/>
       <arg line="--coverage-html"/>
@@ -199,7 +199,7 @@
     </exec>
   </target>
 
-  <target name="codeception-ci" depends="-preflight, -codeception-catenv-ci" description="Run codeception tests">
+  <target name="codeception-ci" depends="-preflight, -codeception-catenv-ci, -codeception-build" description="Run codeception tests">
     <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
       <arg line="run"/>
       <arg line="--fail-fast"/>
@@ -207,6 +207,12 @@
       <arg line="--xml"/>
       <arg line="--no-exit"/>
       <arg line="${codeception.env}"/>
+    </exec>
+  </target>
+
+  <target name="-codeception-build" depends="-preflight" description="Build codeception classes">
+    <exec executable="${dir.bin}/codecept" logoutput="true" checkreturn="true" level="debug">
+      <arg line="build"/>
     </exec>
   </target>
 
