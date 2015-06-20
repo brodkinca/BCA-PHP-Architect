@@ -21,7 +21,7 @@ trait Codeception
      *
      * @return Robo\Result
      */
-    public function taskTest($suite = null)
+    public function taskTest($suite = null, $args = [])
     {
         $codecept = $this->taskCodecept()
             ->coverage()
