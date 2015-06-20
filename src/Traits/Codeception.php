@@ -18,10 +18,11 @@ trait Codeception
      * Run Codeception.
      *
      * @param string $suite Name of test suite to run.
+     * @param array  $args  Array of arguments.
      *
      * @return Robo\Result
      */
-    public function taskTest($suite = null, $args = [])
+    public function taskTest($suite = null, array $args = [])
     {
         $codecept = $this->taskCodecept()
             ->coverage()
@@ -32,6 +33,11 @@ trait Codeception
 
         if (!empty($suite)) {
             $codecept->suite($suite);
+        }
+
+        // Show debug information?
+        if (isset($args['verbose']) && $args['verbose']) {
+            $codecept->debug();
         }
 
         return $codecept->run();
