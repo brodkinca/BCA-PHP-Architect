@@ -27,7 +27,6 @@ trait Phploc
 
         return $this->taskExec(Config::get('pathComposerBin').'/phploc')
             ->option('log-xml', Config::get('pathBuildDir').'/logs/phploc.xml')
-            ->option('git-repository', '.')
             ->arg(Config::get('pathsPhploc'))
             ->run();
     }
