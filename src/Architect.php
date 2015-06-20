@@ -147,7 +147,7 @@ abstract class Architect extends \Robo\Tasks
      * Get weights for all tasks.
      * @return array Method names, sorted by weight.
      */
-    public function getTasksWeighted()
+    private function getTasksWeighted()
     {
         $it = new \ArrayIterator(self::$weights);
         $it->asort();

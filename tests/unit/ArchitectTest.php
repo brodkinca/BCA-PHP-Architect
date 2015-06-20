@@ -139,6 +139,9 @@ class ArchitectTest extends \PHPUnit_Framework_TestCase
     {
         $reflector = new \ReflectionClass($this->class);
 
+        $methodReflector = $reflector->getMethod('getTasksWeighted');
+        $methodReflector->setAccessible(true);
+
         $propertyReflector = $reflector->getParentClass()->getProperty('weights');
         $propertyReflector->setAccessible(true);
         $propertyReflector->setValue($this->class, []);
@@ -159,7 +162,7 @@ class ArchitectTest extends \PHPUnit_Framework_TestCase
         $this->class->setWeight('methodNameTwo', 200);
         $this->class->setWeight('methodNameThree', 100);
 
-        $weights = $this->class->getTasksWeighted();
+        $weights = $methodReflector->invoke($this->class);
 
         $this->assertThat(
             is_array($weights),
