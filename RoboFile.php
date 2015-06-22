@@ -7,6 +7,7 @@
  */
 class RoboFile extends \BCA\Architect\Architect
 {
+    use \BCA\Architect\Traits\Apigen;
     use \BCA\Architect\Traits\Codeception;
     use \BCA\Architect\Traits\Pdepend;
     use \BCA\Architect\Traits\Phpcb;
