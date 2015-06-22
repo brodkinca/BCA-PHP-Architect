@@ -154,11 +154,11 @@ abstract class Architect extends \Robo\Tasks
      */
     private function getTasksWeighted()
     {
-        $it = new \ArrayIterator(self::$weights);
-        $it->asort();
+        $weightIt = new \ArrayIterator(self::$weights);
+        $weightIt->asort();
 
         $weights = [];
-        foreach ($it as $task => $weight) {
+        foreach ($weightIt as $task => $weight) {
             $weights[$task] = $task;
         }
 
