@@ -14,5 +14,6 @@ class RoboFile extends \BCA\Architect\Architect
     use \BCA\Architect\Traits\Phpcs;
     use \BCA\Architect\Traits\Phpcpd;
     use \BCA\Architect\Traits\Phplint;
+    use \BCA\Architect\Traits\Phpmd;
     use \BCA\Architect\Traits\Phploc;
 }
