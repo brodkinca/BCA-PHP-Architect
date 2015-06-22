@@ -37,26 +37,29 @@ class Config
      */
     public function __construct(RoboFile $robo)
     {
-        // Set system-wide default values.
-        $defaults['pathArchitect'] = __DIR__;
-        $defaults['pathProject'] = self::getProjectPath($robo);
-        $defaults['pathComposerVendor'] = $defaults['pathProject'].'/vendor';
-        $defaults['pathComposerBin'] = $defaults['pathComposerVendor'].'/bin';
-        $defaults['pathBuildDir'] = $defaults['pathProject'].'/build';
-
-        $defaults['pathsSrc'] = ['src'];
-        $defaults['pathsTests'] = ['tests'];
-
-        self::$defaults = new \Illuminate\Config\Repository($defaults);
-
         // Load project configuration.
         $projectConfig = [];
-        $projectConfigFile = $defaults['pathProject'].'/architect.json';
+        $projectConfigFile = self::getProjectPath($robo).'/architect.json';
         if (file_exists($projectConfigFile)) {
             $projectConfig = json_decode(file_get_contents($projectConfigFile), true);
         }
 
         self::$config = new \Illuminate\Config\Repository((array) $projectConfig);
+
+        // Set system-wide default values.
+        self::$defaults = new \Illuminate\Config\Repository();
+
+        self::setDefault('pathArchitect', __DIR__);
+        self::setDefault('pathProject', self::getProjectPath($robo));
+        self::setDefault('pathComposerVendor', self::get('pathProject').'/vendor');
+        self::setDefault('pathComposerBin', self::get('pathComposerVendor').'/bin');
+        self::setDefault('pathBuildDir', self::get('pathProject').'/build');
+        self::setDefault('projectTitle', self::getProjectTitle());
+
+        self::setDefault('pathsSrc', ['src']);
+        self::setDefault('pathsTests', ['tests']);
+
+
     }
 
     /**
@@ -80,6 +83,19 @@ class Config
     {
         $reflector = new \ReflectionClass($robo);
         return dirname($reflector->getFileName());
+    }
+
+    /**
+     * Generate title for current project.
+     * @return string Title of project
+     */
+    private function getProjectTitle()
+    {
+        $title = basename(self::get('pathProject'));
+        $title = ucwords($title);
+        $title = preg_replace('/-/', ' ', $title);
+
+        return $title;
     }
 
     /**
