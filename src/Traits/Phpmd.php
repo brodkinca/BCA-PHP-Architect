@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phpmd
 {
@@ -47,5 +45,15 @@ trait Phpmd
         }
 
         return $exec->run();
+    }
+
+    /**
+     * Boot phpmd trait.
+     * @return void
+     */
+    protected function bootPhpmd()
+    {
+        // Set weights.
+        Architect::setWeight('taskPhpmd', 40);
     }
 }

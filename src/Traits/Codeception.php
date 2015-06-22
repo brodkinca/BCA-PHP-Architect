@@ -10,6 +10,7 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
 
 trait Codeception
@@ -41,5 +42,15 @@ trait Codeception
         }
 
         return $codecept->run();
+    }
+
+    /**
+     * Boot codeception trait.
+     * @return void
+     */
+    protected function bootCodeception()
+    {
+        // Set weights.
+        Architect::setWeight('taskTest', 60);
     }
 }

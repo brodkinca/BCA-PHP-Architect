@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phpcpd
 {
@@ -38,5 +36,15 @@ trait Phpcpd
         }
 
         return $exec->run();
+    }
+
+    /**
+     * Boot phpcpd trait.
+     * @return void
+     */
+    protected function bootPhpcpd()
+    {
+        // Set weights.
+        Architect::setWeight('taskPhpcpd', 40);
     }
 }

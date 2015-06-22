@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phplint
 {
@@ -32,5 +30,15 @@ trait Phplint
             ->arg('-l')
             ->arg(Config::get('pathsPhplint'))
             ->run();
+    }
+
+    /**
+     * Boot phplint trait.
+     * @return void
+     */
+    protected function bootPhplint()
+    {
+        // Set weights.
+        Architect::setWeight('taskPhplint', Architect::WEIGHT_PRE);
     }
 }

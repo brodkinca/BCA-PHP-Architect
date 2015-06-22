@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phpcb
 {
@@ -32,5 +30,15 @@ trait Phpcb
         }
 
         return $exec->run();
+    }
+
+    /**
+     * Boot phpcb trait.
+     * @return void
+     */
+    protected function bootPhpcb()
+    {
+        // Set weights.
+        Architect::setWeight('taskPhpcb', Architect::WEIGHT_FINAL);
     }
 }

@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phploc
 {
@@ -29,5 +27,15 @@ trait Phploc
             ->option('log-xml', Config::get('pathBuildDir').'/logs/phploc.xml')
             ->arg(Config::get('pathsPhploc'))
             ->run();
+    }
+
+    /**
+     * Boot phploc trait.
+     * @return void
+     */
+    protected function bootPhploc()
+    {
+        // Set weights.
+        Architect::setWeight('taskPhploc', Architect::WEIGHT_POST);
     }
 }

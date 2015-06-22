@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Phpcs
 {
@@ -109,5 +107,9 @@ trait Phpcs
                 '/bca/phpcs-standard/src/BCA/CodingStandard/BCA'
             )
         );
+
+        // Set weights.
+        Architect::setWeight('taskPhpcs', 50);
+        Architect::setWeight('taskPhpcbf', Architect::WEIGHT_NO_RUN);
     }
 }

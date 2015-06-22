@@ -10,10 +10,8 @@
 
 namespace BCA\Architect\Traits;
 
+use \BCA\Architect\Architect;
 use \BCA\Architect\Config;
-use \Robo\Output;
-use \Robo\Task\Exec;
-use \Robo\Result;
 
 trait Pdepend
 {
@@ -33,5 +31,15 @@ trait Pdepend
             ->arg(Config::get('pathsPdepend'));
 
         return $exec->run();
+    }
+
+    /**
+     * Boot pdepend trait.
+     * @return void
+     */
+    protected function bootPdepend()
+    {
+        // Set weights.
+        Architect::setWeight('taskPdepend', Architect::WEIGHT_POST);
     }
 }
