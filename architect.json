@@ -1,0 +1,4 @@
+{
+    "phpcsStandard": "phpcs.xml",
+    "phpmdRuleset": "phpmd.xml"
+}

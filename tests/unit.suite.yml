@@ -1,0 +1,5 @@
+class_name: AssertsTester
+modules:
+    enabled: []
+coverage:
+    enabled: true
