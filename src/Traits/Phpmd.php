@@ -21,28 +21,12 @@ trait Phpmd
      */
     public function taskPhpmd()
     {
-        Config::setDefault('pathsPhpmd', array_merge(
-            (array) Config::get('pathsSrc'),
-            (array) Config::get('pathsTests')
-        ));
-
-        Config::setDefault('phpmdRuleset', 'cleancode,codesize,design,naming,unusedcode');
-
-        // Use XML logs in CI.
-        $format = 'text';
-        if ((bool) getenv('CI')) {
-            $format = 'xml';
-        }
-
         $exec = $this->taskExec(Config::get('pathComposerBin').'/phpmd')
             ->arg(implode(Config::get('pathsPhpmd'), ','))
-            ->arg($format)
-            ->arg(Config::get('phpmdRuleset'));
-
-        // Set log path in CI.
-        if ((bool) getenv('CI')) {
-            $exec->option('reportfile', Config::get('pathBuildDir').'/logs/phpmd.xml');
-        }
+            ->arg('xml')
+            ->arg(Config::get('phpmdRuleset'))
+            ->option('suffixes', 'php')
+            ->option('reportfile', Config::get('pathBuildDir').'/logs/phpmd.xml');
 
         return $exec->run();
     }
@@ -53,6 +37,9 @@ trait Phpmd
      */
     protected function bootPhpmd()
     {
+        Config::setDefault('phpmdRuleset', 'cleancode,codesize,design,naming,unusedcode');
+        Config::setDefault('pathsPhpmd', Config::get('pathsSrc'));
+
         // Set weights.
         Architect::setWeight('taskPhpmd', 40);
     }

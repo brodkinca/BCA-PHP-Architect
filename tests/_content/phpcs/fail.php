@@ -8,4 +8,4 @@
  * @copyright  2015 Brodkin CyberArts
  */
 
-$this = [];
+$this = array();

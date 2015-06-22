@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="BCA Coding Standard">
+
+  <description>CodeSniffer standard for use in BCA projects.</description>
+
+  <rule ref="vendor/bca/phpcs-standard/src/BCA/CodingStandard/BCA"/>
+
+  <exclude-pattern>*/tests/_content/*</exclude-pattern>
+
+</ruleset>
