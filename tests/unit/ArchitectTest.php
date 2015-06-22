@@ -10,6 +10,8 @@
 
 namespace BCA\Architect\Tests;
 
+use BCA\Architect\Architect;
+
 /**
  * Test \BCA\Architect\Architect.
  */
@@ -152,7 +154,8 @@ class ArchitectTest extends \PHPUnit_Framework_TestCase
                     'methodNameThree' => 'methodNameThree',
                     'methodNameOne' => 'methodNameOne',
                     'methodNameFour' => 'methodNameFour',
-                    'methodNameTwo' => 'methodNameTwo'
+                    'methodNameTwo' => 'methodNameTwo',
+                    'methodNameFive' => 'methodNameFive'
                 ]
             ]
         );
@@ -162,15 +165,19 @@ class ArchitectTest extends \PHPUnit_Framework_TestCase
         $this->class->setWeight('methodNameTwo', 200);
         $this->class->setWeight('methodNameThree', 100);
 
+        // Add a value that should not be returned.
+        $this->class->setWeight('methodNameFive', Architect::WEIGHT_NO_RUN);
+
         $weights = $methodReflector->invoke($this->class);
 
+        $this->assertNotContains('methodNameFive', $weights);
         $this->assertThat(
             is_array($weights),
             $this->isTrue()
         );
         $this->assertThat(
             count($propertyReflector->getValue($this->class)),
-            $this->equalTo(3)
+            $this->equalTo(4)
         );
         $this->assertThat(
             count($weights),

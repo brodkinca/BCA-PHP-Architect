@@ -20,6 +20,11 @@ abstract class Architect extends \Robo\Tasks
 {
     use Traits\Setup;
 
+    const WEIGHT_NO_RUN = -1;
+    const WEIGHT_PRE = 0;
+    const WEIGHT_POST = 10000000;
+    const WEIGHT_FINAL = 10000001;
+
     /**
      * Configuration store.
      * @var Config
@@ -157,7 +162,17 @@ abstract class Architect extends \Robo\Tasks
             $weights[$task] = $task;
         }
 
-        return array_values(array_merge($weights, $this->getTasks()));
+        $weightsOrdered = array_values(array_merge($weights, $this->getTasks()));
+
+        return array_filter($weightsOrdered, function ($task) {
+            if (isset(self::$weights[$task])
+                && self::$weights[$task] === self::WEIGHT_NO_RUN
+            ) {
+                return false;
+            }
+
+            return true;
+        });
     }
 
     /**
